@@ -10,36 +10,69 @@ import {
   DEPENDENT_VARIANT
 } from './coinTypes';
 
+/**
+ * isMultivariant returns true if a coin's type is one of the two multivariant types, false otherwise
+ *
+ * @param {Object} coin coin to check whether it is multivariant or not
+ */
 function isMultivariant(coin) {
   return coin.type === MULTIVARIANT || coin.type === DEPENDENT_MULTIVARIANT;
 }
 
+/**
+ * isDependent returns true if a coin's type is one of the two dependent types, false otherwise
+ *
+ * @param {Object} coin coin to check whehther it is dependent or not
+ */
 function isDependent(coin) {
   return coin.type === DEPENDENT || coin.type === DEPENDENT_MULTIVARIANT;
 }
 
+/**
+ * getVariant returns a coin's variant matching the name passed if the variant exists, null otherwise
+ *
+ * @param {Object} coin coin to check for variant matching name passed
+ * @param {String} name name of variant to search for
+ */
 function getVariant(coin, name) {
-  return coin.variants.find(variant => variant.name === name) || null;
-}
-
-function getDependent(coin, name) {
   if (isMultivariant(coin)) {
-    for (let i = 0; i < coin.variants.length; i += 1) {
-      const dependents = coin.variants[i].dependsOn;
-
-      if (dependents) {
-        const variant = dependents.find(match => match.name === name);
-
-        if (variant) return variant;
-      }
-    }
-  } else {
-    return coin.dependsOn.find(dependent => dependent.name === name) || null;
+    return coin.variants.find(v => v.name === name) || null;
   }
 
   return null;
 }
 
+/**
+ * getDependent returns a coin's dependent coin config matching the name passed if the dependent exists, null otherwise
+ *
+ * @param {Object} coin coin to check for dependents matching name passed
+ * @param {String} name name of dependent to search for
+ */
+function getDependent(coin, name) {
+  if (isDependent(coin)) {
+    if (isMultivariant(coin)) {
+      for (let i = 0; i < coin.variants.length; i += 1) {
+        const dependents = coin.variants[i].dependsOn;
+
+        if (dependents) {
+          const variant = dependents.find(match => match.name === name);
+
+          if (variant) return variant;
+        }
+      }
+    } else {
+      return coin.dependsOn.find(dependent => dependent.name === name) || null;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Variant reprsents a test variant that is used in Multivariant coins
+ *
+ * @param {Object} definition the test definition that's used to define the variant
+ */
 export function Variant(definition) {
   const properties = {
     metadata: definition.metadata,
@@ -51,10 +84,15 @@ export function Variant(definition) {
   return assign({}, properties);
 }
 
+/**
+ * DependentVariant represents a test variant that may be used in DependentMultivariantCoin
+ *
+ * @param {Object} definition the test definition that's used to define the variant
+ */
 export function DependentVariant(definition) {
   const properties = {
-    dependsOn: definition.dependsOn,
-    metadata: definition.metadata,
+    dependsOn: definition.dependsOn || [],
+    metadata: definition.metadata || {},
     name: definition.name,
     probability: definition.probability,
     type: DEPENDENT_VARIANT
@@ -63,6 +101,11 @@ export function DependentVariant(definition) {
   return assign({}, properties);
 }
 
+/**
+ * Coin represents the simplest form of a test (A/Control test)
+ *
+ * @param {Object} definition the test definition that's used to define the test
+ */
 export function Coin(definition) {
   const properties = {
     metadata: definition.metadata || {},
@@ -80,7 +123,11 @@ export function Coin(definition) {
 
   return deepFreeze(assign({}, properties, funcs), exclusions);
 }
-
+/**
+ * DependentCoin represents a test who outcome can depend on another test
+ *
+ * @param {Object} definition the test definition that's used to define the test
+ */
 export function DependentCoin(definition) {
   const properties = {
     dependsOn: definition.dependsOn || [],
@@ -101,6 +148,11 @@ export function DependentCoin(definition) {
   return deepFreeze(assign({}, properties, funcs), exclusions);
 }
 
+/**
+ * DependentMultivariantCoin represents a test that can have multiple variants (A/B/C/D/Control) and those variants can be dependent on other tests
+ *
+ * @param {Object} definition the test definition that's used to define the test
+ */
 export function DependentMultivariantCoin(definition) {
   const properties = {
     metadata: definition.metadata || {},
@@ -135,6 +187,11 @@ export function DependentMultivariantCoin(definition) {
   return deepFreeze(assign({}, properties, funcs), exclusions);
 }
 
+/**
+ * MultivariantCoin represents a test that can have multiple variants (A/B/C/D/Control)
+ *
+ * @param {Object} definition the test definition that's used to define the test
+ */
 export function MultivariantCoin(definition) {
   const properties = {
     metadata: definition.metadata || {},

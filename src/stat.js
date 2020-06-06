@@ -1,6 +1,6 @@
 /**
  * Creates an array of maxSize items with the sample filled appropriately
- * Array returned will always be of max size no matter what
+ * Array returned will always be of size max
  *
  * @param {Array} values Array of object to be used to add to sample { count: number, value: any }
  * @param {number} maxSize Max number of items in array to be returned

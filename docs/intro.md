@@ -6,8 +6,10 @@ sidebar_label: Welcome!
 
 ## What the heck is Bandit?
 
-Bandit is a dead simple A/B testing (statistical hypothesis) Javascript library. Bandit's goal is to make A/B testing more accessible for developers looking to put together Javascript applications quickly.
+Bandit is a dead simple A/B testing (statistical hypothesis) Javascript library. Bandit's goal is to make A/B testing more accessible for application writers.
 
-There are currently 3 different kinds of testing types Bandit supports, normal A/B tests, multivariate tests & dependent A/B tests.
+There are currently 3 different kinds of testing types Bandit supports, normal, multivariate & dependent A/B tests.
 
-Bandit is primarily configuaration driven, your tests are all derived from a JSON configuration you provide when instanciating your tests.
+Bandit is primarily configuaration driven, your A/B are all derived from a JSON configuration you provide when instanciating Bandit.
+
+Get started [here](getting_started.md)
