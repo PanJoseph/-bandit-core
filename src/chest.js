@@ -228,9 +228,7 @@ function Chest(testDefinitions) {
 
   if (circularCheck.isCircular) {
     throw new Error(
-      `The ${
-        circularCheck.node
-      } test has a dependency or is dependent on a test with a circular dependency in its configuration.`
+      `The ${circularCheck.node} test has a dependency or is dependent on a test with a circular dependency in its configuration.`
     );
   }
 
