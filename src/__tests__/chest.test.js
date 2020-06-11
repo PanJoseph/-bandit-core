@@ -10,6 +10,24 @@ describe('Chest tests', () => {
       expect(chest.coins.length).toEqual(7);
     });
 
+    it('throws an error when test sample is not valid', () => {
+      const badSample = [
+        {
+          metadata: {
+            persist: false
+          },
+          name: 'normal1',
+          probability: 100,
+          type: 'invalid'
+        }
+      ];
+      expect(() => Chest(badSample)).toThrow(
+        new Error(
+          `The type on the test with the following test definition ${badSample[0]} is invalid`
+        )
+      );
+    });
+
     it('throws an error when a circular dependency is found', () => {
       expect(() => Chest(circularSample)).toThrow(
         new Error(
