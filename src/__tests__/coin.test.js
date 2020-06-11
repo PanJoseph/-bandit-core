@@ -40,6 +40,10 @@ describe('Coin tests', () => {
     it('does not have a frozen metadata property', () => {
       expect(Object.isFrozen(testCoin.metadata)).toBeFalsy();
     });
+
+    it('returns a proper mapping', () => {
+      expect(testCoin.createMapping()).toEqual([{ count: 10, value: 'normal' }]);
+    });
   });
 
   describe('Dependent coin test', () => {
@@ -97,6 +101,10 @@ describe('Coin tests', () => {
       });
 
       expect(noDependentTestCoin.dependsOn).toEqual([]);
+    });
+
+    it('returns a proper mapping', () => {
+      expect(testCoin.createMapping()).toEqual([{ count: 10, value: 'dependent' }]);
     });
   });
 
@@ -162,6 +170,14 @@ describe('Coin tests', () => {
       });
 
       expect(testCoin.getVariant('fake')).toBeFalsy();
+    });
+
+    it('returns a proper mapping', () => {
+      expect(testCoin.createMapping()).toEqual([
+        { count: 10, value: 'variant1' },
+        { count: 20, value: 'variant2' },
+        { count: 30, value: 'variant3' }
+      ]);
     });
   });
 
@@ -254,6 +270,14 @@ describe('Coin tests', () => {
       });
 
       expect(testCoin.getVariant('fake')).toBeFalsy();
+    });
+
+    it('returns a proper mapping', () => {
+      expect(testCoin.createMapping()).toEqual([
+        { count: 10, value: 'variant1' },
+        { count: 20, value: 'variant2' },
+        { count: 30, value: 'variant3' }
+      ]);
     });
   });
 });

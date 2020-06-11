@@ -8,6 +8,12 @@ import { flattenDeep } from './utils';
 import { DEPENDENT, DEPENDENT_MULTIVARIANT } from './coinTypes';
 import applyCurrencyConverters from './applyCurrencyConverter';
 
+/**
+ * getCoin searches a list of coins for a coin by and returns that coin if found or null otherwise
+ *
+ * @param {Array} coins list to search for coin
+ * @param {String} name name of coin to search coins for
+ */
 function getCoin(coins, name) {
   for (let i = 0; i < coins.length; i += 1) {
     const coin = coins[i];
@@ -25,12 +31,17 @@ function getCoin(coins, name) {
   return null;
 }
 
-function createNodeMap(coins) {
-  const dependentCoin = coins.filter(coin => coin.isDependent());
-  const nodeMap = dependentCoin.map(coin => {
+/**
+ * createNodeMapping taken an array of coins and creates a node mapping that can be transformed into a node graph
+ *
+ * @param {Array} coins coins to transform into a node mapping
+ */
+function createNodeMapping(coins) {
+  const nodeMap = [];
+  coins.forEach(coin => {
     switch (coin.type) {
       case DEPENDENT:
-        return {
+        nodeMap.push({
           name: coin.name,
           children: coin.dependsOn.map(child => getCoin(coins, child.name)),
           details: {
@@ -39,68 +50,69 @@ function createNodeMap(coins) {
             probability: coin.probability,
             type: coin.type
           }
-        };
+        });
+        break;
       case DEPENDENT_MULTIVARIANT:
-        return coin.variants.map(variant => ({
-          name: variant.name,
-          children: variant.dependsOn
-            ? variant.dependsOn.map(child => getCoin(coins, child.name))
-            : [],
-          details: {
-            dependsOn: variant.dependsOn || [],
-            metadata: coin.metadata || {},
-            probability: variant.probability,
-            type: coin.type
-          }
-        }));
+        nodeMap.push(
+          coin.variants.map(variant => ({
+            name: variant.name,
+            children: variant.dependsOn
+              ? variant.dependsOn.map(child => getCoin(coins, child.name))
+              : [],
+            details: {
+              dependsOn: variant.dependsOn || [],
+              metadata: coin.metadata || {},
+              probability: variant.probability,
+              type: coin.type
+            }
+          }))
+        );
+        break;
       default:
-        return null;
+        break;
     }
   });
 
   return flattenDeep(nodeMap);
 }
 
+/**
+ * createNodeGraph takes a list of coins and creates a graph where vertices are dependent
+ * coins and edges point to coins vertex is dependent on
+ *
+ * @param {Array} coins coins list to create dependent node mapping with
+ */
 function createNodeGraph(coins) {
-  const nodeMap = createNodeMap(coins);
   const nodeGraph = new Graph();
 
-  nodeMap.forEach(node => {
+  createNodeMapping(coins).forEach(node => {
     nodeGraph.addNode(node.name, node.details);
     node.children.forEach(child => {
-      if (child) {
-        nodeGraph.addNode(child.name);
-        nodeGraph.addEdge(node.name, child.name);
-      }
+      nodeGraph.addNode(child.name);
+      nodeGraph.addEdge(node.name, child.name);
     });
   });
 
   return nodeGraph;
 }
 
-function createMultivariantMapping(coin) {
-  return coin.variants.map(variant => ({
-    count: variant.probability,
-    value: variant.name
-  }));
-}
-
-function createRegularMapping(coin) {
-  return [{ count: coin.probability, value: coin.name }];
-}
-
+/**
+ * flip takes a chest of coins and "flips" them to set their value whether the test the coin represents is on or off
+ *
+ * @param {Array} coins list of coins to flip and select values for
+ */
 function flip(coins) {
-  return coins.map(coin => {
-    if (coin.isMultivariant()) {
-      return pickSample(shuffle(createSample(createMultivariantMapping(coin), 100)));
-    }
-
-    return pickSample(shuffle(createSample(createRegularMapping(coin), 100)));
-  });
+  return coins.map(coin => pickSample(shuffle(createSample(coin.createMapping(), 100))));
 }
 
-function setPickingOrder(sample) {
-  const order = cloneDeep(sample);
+/**
+ * setPickingOrder sorts a list of coins into an order at which they can be flipped in a single pass
+ * This sort orders the coins in such a way that coins will always be flipped before an coins that are dependent on them
+ *
+ * @param {Array} coins list of coins to sort
+ */
+function setPickingOrder(coins) {
+  const order = cloneDeep(coins);
 
   order.sort((a, b) => {
     if (!a.isDependent() && b.isDependent()) {
@@ -122,6 +134,12 @@ function setPickingOrder(sample) {
   return order;
 }
 
+/**
+ * isDependentActive determines whether or not a dependent coin should be active in a sample of flipped coins
+ *
+ * @param {Array} sample random sample to use for check whether dependent coin needs to be active in
+ * @param {Object} dependent dependent coin to check if the test it represents is active or not
+ */
 function isDependentActive(sample, dependent) {
   const index = sample.indexOf(dependent.name);
   let isActive = index > -1;
@@ -152,6 +170,13 @@ function isDependentActive(sample, dependent) {
   return isActive;
 }
 
+/**
+ * mix takes a chest of coins and does the work to set all the coins in the chest to active or inactive
+ * mix will flip all the coins, handle any forced dependencies & apply any currency converters passed
+ *
+ * @param {Array} coins chest of coins to mix
+ * @param {AArray} converters currency converters to apply to each coin once they have been sampled and flipped, the converters should be ordered from last to first applied
+ */
 function mix(coins, converters) {
   const orderedCoins = setPickingOrder(coins);
   const sample = flip(orderedCoins);
@@ -196,6 +221,10 @@ function mix(coins, converters) {
   return finalMix;
 }
 
+/**
+ * Chests represent a set of tests in coin form
+ * @param {Array} testDefinitions list of test definitions to transform into coins that will fill this chest
+ */
 function Chest(testDefinitions) {
   const properties = {
     coins: testDefinitions.map(testDefinition => {

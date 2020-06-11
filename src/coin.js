@@ -68,6 +68,22 @@ function getDependent(coin, name) {
   return null;
 }
 
+function createMapping(coin) {
+  switch (coin.type) {
+    case MULTIVARIANT:
+    case DEPENDENT_MULTIVARIANT:
+      return coin.variants.map(variant => ({
+        count: variant.probability,
+        value: variant.name
+      }));
+    case NORMAL:
+    case DEPENDENT:
+      return [{ count: coin.probability, value: coin.name }];
+    default:
+      return null;
+  }
+}
+
 /**
  * Variant reprsents a test variant that is used in Multivariant coins
  *
@@ -116,7 +132,8 @@ export function Coin(definition) {
 
   const funcs = {
     isMultivariant: () => isMultivariant(properties),
-    isDependent: () => isDependent(properties)
+    isDependent: () => isDependent(properties),
+    createMapping: () => createMapping(properties)
   };
 
   const exclusions = ['metadata'];
@@ -140,7 +157,8 @@ export function DependentCoin(definition) {
   const funcs = {
     getDependent: name => getDependent(properties, name),
     isMultivariant: () => isMultivariant(properties),
-    isDependent: () => isDependent(properties)
+    isDependent: () => isDependent(properties),
+    createMapping: () => createMapping(properties)
   };
 
   const exclusions = ['metadata'];
@@ -179,7 +197,8 @@ export function DependentMultivariantCoin(definition) {
     getDependent: name => getDependent(properties, name),
     getVariant: name => getVariant(properties, name),
     isMultivariant: () => isMultivariant(properties),
-    isDependent: () => isDependent(properties)
+    isDependent: () => isDependent(properties),
+    createMapping: () => createMapping(properties)
   };
 
   const exclusions = ['metadata'];
@@ -207,7 +226,8 @@ export function MultivariantCoin(definition) {
   const funcs = {
     getVariant: name => getVariant(properties, name),
     isMultivariant: () => isMultivariant(properties),
-    isDependent: () => isDependent(properties)
+    isDependent: () => isDependent(properties),
+    createMapping: () => createMapping(properties)
   };
 
   const exclusions = ['metadata'];
