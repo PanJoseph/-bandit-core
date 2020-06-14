@@ -219,7 +219,9 @@ function checkChestNamespace(coin, testDefinition, namespace) {
     coin.variants.forEach(variant => {
       if (namespace[variant.name] === true) {
         throw new Error(
-          `The name ${variant.name} on the test with the following test definition ${testDefinition} is already in use`
+          `The name ${variant.name} on the test with the following test definition ${JSON.stringify(
+            testDefinition
+          )} is already in use`
         );
       }
       // eslint-disable-next-line no-param-reassign
@@ -228,7 +230,9 @@ function checkChestNamespace(coin, testDefinition, namespace) {
   } else {
     if (namespace[coin.name] === true) {
       throw new Error(
-        `The name ${coin.name} on the test with the following test definition ${testDefinition} is already in use`
+        `The name ${coin.name} on the test with the following test definition ${JSON.stringify(
+          testDefinition
+        )} is already in use`
       );
     }
     // eslint-disable-next-line no-param-reassign
@@ -260,7 +264,9 @@ function Chest(testDefinitions) {
           break;
         default:
           throw new Error(
-            `The type on the test with the following test definition ${testDefinition} is invalid`
+            `The type on the test with the following test definition ${JSON.stringify(
+              testDefinition
+            )} is invalid`
           );
       }
       checkChestNamespace(coin, testDefinition, chestNamespace);

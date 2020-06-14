@@ -68,7 +68,14 @@ function getDependent(coin, name) {
   return null;
 }
 
-function createMapping(coin) {
+/**
+ * createSamplingMapping maps a coin to a form where it can be used in a when creating a sample
+ *
+ * @param {Object} coin coin to create sampling mapping with
+ * @example Normal(Dependent)Coin(name: 'coin1', probability: 10) => [{count: 10, value: 'coin1}]
+ * @example MultivariantCoin(variants: [{name: 'variant1', probability: 10}, {name : 'variant2', probability: 20}]) => [{count: 10, value: 'variant1'}, {count: 20, value: 'variant2'}]
+ */
+function createSamplingMapping(coin) {
   switch (coin.type) {
     case MULTIVARIANT:
     case DEPENDENT_MULTIVARIANT:
@@ -85,6 +92,34 @@ function createMapping(coin) {
 }
 
 /**
+ * validateField takes a field and ensures that it is defined and also does an explicit check for probability
+ * to be a valid value when it is the field being checked.
+ *
+ * @param {Any} fieldValue value of the field
+ * @param {String} fieldName  name of field
+ * @param {Object} testDefinition entire definition that was passed for this field
+ */
+function validateField(fieldValue, fieldName, testDefinition) {
+  if (fieldValue === null || fieldValue === undefined) {
+    throw new Error(
+      `Required Field ${fieldName} was not a valid value (non-null) in ${JSON.stringify(
+        testDefinition
+      )}, instead value was ${fieldValue}`
+    );
+  }
+
+  if (fieldName === 'probability' && (fieldValue < 0 || fieldValue > 100)) {
+    throw new Error(
+      `The probability of a coin/variant cannot be less than 0 or greater than 100 instead ${fieldValue} was found in the ${JSON.stringify(
+        testDefinition
+      )} definition`
+    );
+  }
+
+  return fieldValue;
+}
+
+/**
  * Variant reprsents a test variant that is used in Multivariant coins
  *
  * @param {Object} definition the test definition that's used to define the variant
@@ -92,8 +127,8 @@ function createMapping(coin) {
 export function Variant(definition) {
   const properties = {
     metadata: definition.metadata || {},
-    name: definition.name,
-    probability: definition.probability,
+    name: validateField(definition.name, 'name', definition),
+    probability: validateField(definition.probability, 'probability', definition),
     type: VARIANT
   };
 
@@ -109,8 +144,8 @@ export function DependentVariant(definition) {
   const properties = {
     dependsOn: definition.dependsOn || [],
     metadata: definition.metadata || {},
-    name: definition.name,
-    probability: definition.probability,
+    name: validateField(definition.name, 'name', definition),
+    probability: validateField(definition.probability, 'probability', definition),
     type: DEPENDENT_VARIANT
   };
 
@@ -125,15 +160,15 @@ export function DependentVariant(definition) {
 export function Coin(definition) {
   const properties = {
     metadata: definition.metadata || {},
-    name: definition.name,
-    probability: definition.probability,
+    name: validateField(definition.name, 'name', definition),
+    probability: validateField(definition.probability, 'probability', definition),
     type: NORMAL
   };
 
   const funcs = {
     isMultivariant: isMultivariant(properties),
     isDependent: isDependent(properties),
-    createMapping: () => createMapping(properties)
+    createSamplingMapping: () => createSamplingMapping(properties)
   };
 
   const exclusions = ['metadata'];
@@ -141,7 +176,7 @@ export function Coin(definition) {
   return deepFreeze(assign({}, properties, funcs), exclusions);
 }
 /**
- * DependentCoin represents a test who outcome can depend on another test
+ * DependentCoin represents a test whose outcome can depend on another test's outcome
  *
  * @param {Object} definition the test definition that's used to define the test
  */
@@ -149,8 +184,8 @@ export function DependentCoin(definition) {
   const properties = {
     dependsOn: definition.dependsOn || [],
     metadata: definition.metadata || {},
-    name: definition.name,
-    probability: definition.probability,
+    name: validateField(definition.name, 'name', definition),
+    probability: validateField(definition.probability, 'probability', definition),
     type: DEPENDENT
   };
 
@@ -158,7 +193,7 @@ export function DependentCoin(definition) {
     getDependent: name => getDependent(properties, name),
     isMultivariant: isMultivariant(properties),
     isDependent: isDependent(properties),
-    createMapping: () => createMapping(properties)
+    createSamplingMapping: () => createSamplingMapping(properties)
   };
 
   const exclusions = ['metadata'];
@@ -180,14 +215,14 @@ export function DependentMultivariantCoin(definition) {
         ? {
             dependsOn: variant.dependsOn,
             metadata: variant.metadata || {},
-            name: variant.name,
-            probability: variant.probability,
+            name: validateField(definition.name, 'name', definition),
+            probability: validateField(definition.probability, 'probability', definition),
             type: DEPENDENT_VARIANT
           }
         : {
             metadata: variant.metadata || {},
-            name: variant.name,
-            probability: variant.probability,
+            name: validateField(definition.name, 'name', definition),
+            probability: validateField(definition.probability, 'probability', definition),
             type: VARIANT
           }
     )
@@ -198,7 +233,7 @@ export function DependentMultivariantCoin(definition) {
     getVariant: name => getVariant(properties, name),
     isMultivariant: isMultivariant(properties),
     isDependent: isDependent(properties),
-    createMapping: () => createMapping(properties)
+    createSamplingMapping: () => createSamplingMapping(properties)
   };
 
   const exclusions = ['metadata'];
@@ -217,8 +252,8 @@ export function MultivariantCoin(definition) {
     type: MULTIVARIANT,
     variants: definition.variants.map(variant => ({
       metadata: variant.metadata || {},
-      name: variant.name,
-      probability: variant.probability,
+      name: validateField(definition.name, 'name', definition),
+      probability: validateField(definition.probability, 'probability', definition),
       type: VARIANT
     }))
   };
@@ -227,7 +262,7 @@ export function MultivariantCoin(definition) {
     getVariant: name => getVariant(properties, name),
     isMultivariant: isMultivariant(properties),
     isDependent: isDependent(properties),
-    createMapping: () => createMapping(properties)
+    createSamplingMapping: () => createSamplingMapping(properties)
   };
 
   const exclusions = ['metadata'];
