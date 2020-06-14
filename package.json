@@ -13,8 +13,6 @@
   ],
   "scripts": {
     "build": "rollup -c",
-    "docs:prep": "cp umd/bandit.js docs/assets/bandit.js",
-    "docs": "npm run docs:prep && docsify serve ./docs",
     "lint": "eslint src/",
     "test": "jest",
     "test:coverage": "jest --coverage"
