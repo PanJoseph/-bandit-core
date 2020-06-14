@@ -91,7 +91,7 @@ function createMapping(coin) {
  */
 export function Variant(definition) {
   const properties = {
-    metadata: definition.metadata,
+    metadata: definition.metadata || {},
     name: definition.name,
     probability: definition.probability,
     type: VARIANT
@@ -131,8 +131,8 @@ export function Coin(definition) {
   };
 
   const funcs = {
-    isMultivariant: () => isMultivariant(properties),
-    isDependent: () => isDependent(properties),
+    isMultivariant: isMultivariant(properties),
+    isDependent: isDependent(properties),
     createMapping: () => createMapping(properties)
   };
 
@@ -156,8 +156,8 @@ export function DependentCoin(definition) {
 
   const funcs = {
     getDependent: name => getDependent(properties, name),
-    isMultivariant: () => isMultivariant(properties),
-    isDependent: () => isDependent(properties),
+    isMultivariant: isMultivariant(properties),
+    isDependent: isDependent(properties),
     createMapping: () => createMapping(properties)
   };
 
@@ -196,8 +196,8 @@ export function DependentMultivariantCoin(definition) {
   const funcs = {
     getDependent: name => getDependent(properties, name),
     getVariant: name => getVariant(properties, name),
-    isMultivariant: () => isMultivariant(properties),
-    isDependent: () => isDependent(properties),
+    isMultivariant: isMultivariant(properties),
+    isDependent: isDependent(properties),
     createMapping: () => createMapping(properties)
   };
 
@@ -225,8 +225,8 @@ export function MultivariantCoin(definition) {
 
   const funcs = {
     getVariant: name => getVariant(properties, name),
-    isMultivariant: () => isMultivariant(properties),
-    isDependent: () => isDependent(properties),
+    isMultivariant: isMultivariant(properties),
+    isDependent: isDependent(properties),
     createMapping: () => createMapping(properties)
   };
 

@@ -30,11 +30,11 @@ describe('Coin tests', () => {
     });
 
     it('is not multivariant', () => {
-      expect(testCoin.isMultivariant()).toBeFalsy();
+      expect(testCoin.isMultivariant).toBeFalsy();
     });
 
     it('is not dependent', () => {
-      expect(testCoin.isDependent()).toBeFalsy();
+      expect(testCoin.isDependent).toBeFalsy();
     });
 
     it('does not have a frozen metadata property', () => {
@@ -83,11 +83,11 @@ describe('Coin tests', () => {
     });
 
     it('is not multivariant', () => {
-      expect(testCoin.isMultivariant()).toBeFalsy();
+      expect(testCoin.isMultivariant).toBeFalsy();
     });
 
     it('is dependent', () => {
-      expect(testCoin.isDependent()).toBeTruthy();
+      expect(testCoin.isDependent).toBeTruthy();
     });
 
     it('does not have a frozen metadata property', () => {
@@ -150,11 +150,11 @@ describe('Coin tests', () => {
     });
 
     it('is multivariant', () => {
-      expect(testCoin.isMultivariant()).toBeTruthy();
+      expect(testCoin.isMultivariant).toBeTruthy();
     });
 
     it('is not dependent', () => {
-      expect(testCoin.isDependent()).toBeFalsy();
+      expect(testCoin.isDependent).toBeFalsy();
     });
 
     it('does not have a frozen metadata property', () => {
@@ -242,11 +242,11 @@ describe('Coin tests', () => {
     });
 
     it('is multivariant', () => {
-      expect(testCoin.isMultivariant()).toBeTruthy();
+      expect(testCoin.isMultivariant).toBeTruthy();
     });
 
     it('is dependent', () => {
-      expect(testCoin.isDependent()).toBeTruthy();
+      expect(testCoin.isDependent).toBeTruthy();
     });
 
     it('does not have a frozen metadata property', () => {

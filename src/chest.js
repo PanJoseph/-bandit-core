@@ -1,5 +1,4 @@
 import assign from 'object-assign';
-import cloneDeep from 'lodash.clonedeep';
 
 import { Coin, DependentCoin, DependentMultivariantCoin, MultivariantCoin } from './coin';
 import Graph from './graph';
@@ -22,7 +21,7 @@ function getCoin(coins, name) {
       return coin;
     }
 
-    if (coin.isMultivariant()) {
+    if (coin.isMultivariant) {
       const variant = coin.getVariant(name);
       if (variant) return variant;
     }
@@ -112,26 +111,22 @@ function flip(coins) {
  * @param {Array} coins list of coins to sort
  */
 function setPickingOrder(coins) {
-  const order = cloneDeep(coins);
-
-  order.sort((a, b) => {
-    if (!a.isDependent() && b.isDependent()) {
+  return [...coins].sort((a, b) => {
+    if (!a.isDependent && b.isDependent) {
       return -1;
     }
 
-    if (a.isDependent() && !b.isDependent()) {
+    if (a.isDependent && !b.isDependent) {
       return 1;
     }
 
-    if (a.isDependent() && b.isDependent()) {
+    if (a.isDependent && b.isDependent) {
       if (a.getDependent(b.name)) return 1;
       if (b.getDependent(a.name)) return -1;
     }
 
     return 0;
   });
-
-  return order;
 }
 
 /**
@@ -175,7 +170,7 @@ function isDependentActive(sample, dependent) {
  * mix will flip all the coins, handle any forced dependencies & apply any currency converters passed
  *
  * @param {Array} coins chest of coins to mix
- * @param {AArray} converters currency converters to apply to each coin once they have been sampled and flipped, the converters should be ordered from last to first applied
+ * @param {Array} converters currency converters to apply to each coin once they have been sampled and flipped, the converters should be ordered from last to first applied
  */
 function mix(coins, converters) {
   const orderedCoins = setPickingOrder(coins);
@@ -183,7 +178,7 @@ function mix(coins, converters) {
   const finalMix = {};
 
   const coinIsActive = samp => coin => {
-    if (coin.isMultivariant()) {
+    if (coin.isMultivariant) {
       return assign({}, coin, {
         variants: coin.variants.map(variant =>
           assign({}, variant, {
@@ -197,7 +192,7 @@ function mix(coins, converters) {
       });
     }
 
-    if (coin.isDependent()) {
+    if (coin.isDependent) {
       return assign({}, coin, { active: isDependentActive(samp, coin) });
     }
 
@@ -206,19 +201,39 @@ function mix(coins, converters) {
 
   const convertedCoins = applyCurrencyConverters(orderedCoins, ...converters, coinIsActive(sample));
 
-  for (let i = 0; i < convertedCoins.length; i += 1) {
-    const coin = convertedCoins[i];
-
-    if (coin.isMultivariant()) {
+  convertedCoins.forEach(coin => {
+    if (coin.isMultivariant) {
       coin.variants.forEach(variant => {
         finalMix[variant.name] = assign({}, variant);
       });
     } else {
       finalMix[coin.name] = assign({}, coin);
     }
-  }
+  });
 
   return finalMix;
+}
+
+function checkChestNamespace(coin, testDefinition, namespace) {
+  if (coin.isMultivariant) {
+    coin.variants.forEach(variant => {
+      if (namespace[variant.name] === true) {
+        throw new Error(
+          `The name ${variant.name} on the test with the following test definition ${testDefinition} is already in use`
+        );
+      }
+      // eslint-disable-next-line no-param-reassign
+      namespace[variant.name] = true;
+    });
+  } else {
+    if (namespace[coin.name] === true) {
+      throw new Error(
+        `The name ${coin.name} on the test with the following test definition ${testDefinition} is already in use`
+      );
+    }
+    // eslint-disable-next-line no-param-reassign
+    namespace[coin.name] = true;
+  }
 }
 
 /**
@@ -226,22 +241,30 @@ function mix(coins, converters) {
  * @param {Array} testDefinitions list of test definitions to transform into coins that will fill this chest
  */
 function Chest(testDefinitions) {
+  const chestNamespace = {};
   const properties = {
     coins: testDefinitions.map(testDefinition => {
+      let coin;
       switch (testDefinition.type) {
         case 'dependent':
-          return DependentCoin(testDefinition);
+          coin = DependentCoin(testDefinition);
+          break;
         case 'dependentMultivariant':
-          return DependentMultivariantCoin(testDefinition);
+          coin = DependentMultivariantCoin(testDefinition);
+          break;
         case 'multivariant':
-          return MultivariantCoin(testDefinition);
+          coin = MultivariantCoin(testDefinition);
+          break;
         case 'normal':
-          return Coin(testDefinition);
+          coin = Coin(testDefinition);
+          break;
         default:
           throw new Error(
             `The type on the test with the following test definition ${testDefinition} is invalid`
           );
       }
+      checkChestNamespace(coin, testDefinition, chestNamespace);
+      return coin;
     })
   };
 

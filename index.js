@@ -1,5 +1,4 @@
 import Chest from './src/chest';
-import Graph from './src/graph';
 import {
   Coin as NormalCoin,
   DependentCoin,
@@ -9,7 +8,6 @@ import {
 
 const Bandit = {
   Chest,
-  Graph,
   NormalCoin,
   DependentCoin,
   DependentMultivariantCoin,

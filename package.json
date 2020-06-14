@@ -1,6 +1,6 @@
 {
-  "name": "@banditjs/bandit-core",
-  "version": "0.1.0-beta",
+  "name": "@bandit/bandit-core",
+  "version": "1.0.0-beta",
   "description": "",
   "main": "cjs/bandit.js",
   "unpkg": "umd/bandit.js",
