@@ -1,4 +1,4 @@
-export const circularSample = [
+export const circularDefinition = [
   {
     dependsOn: [
       {
@@ -29,7 +29,7 @@ export const circularSample = [
   }
 ];
 
-export const fixedSample = [
+export const fixedDefinition = [
   {
     metadata: {
       persist: false
@@ -100,7 +100,7 @@ export const fixedSample = [
   },
   {
     metadata: {},
-    name: 'multi',
+    name: 'depMulti',
     type: 'dependentMultivariant',
     variants: [
       {
@@ -121,7 +121,7 @@ export const fixedSample = [
   }
 ];
 
-export const fullSample = [
+export const fullDefinition = [
   {
     metadata: {
       persist: false

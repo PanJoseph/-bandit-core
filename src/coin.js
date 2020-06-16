@@ -206,6 +206,7 @@ export function DependentCoin(definition) {
 export function DependentMultivariantCoin(definition) {
   const properties = {
     metadata: definition.metadata || {},
+    name: validateField(definition.name, 'name', definition),
     type: DEPENDENT_MULTIVARIANT,
     variants: definition.variants.map(variant =>
       variant.dependsOn
@@ -246,6 +247,7 @@ export function DependentMultivariantCoin(definition) {
 export function MultivariantCoin(definition) {
   const properties = {
     metadata: definition.metadata || {},
+    name: validateField(definition.name, 'name', definition),
     type: MULTIVARIANT,
     variants: definition.variants.map(variant => ({
       metadata: variant.metadata || {},

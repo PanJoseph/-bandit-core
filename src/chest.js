@@ -186,7 +186,7 @@ function mix(coins, converters) {
               ? isDependentActive(samp, variant)
               : samp.indexOf(variant.name) > -1,
             metadata: variant.metadata || coin.metadata,
-            type: coin.type
+            type: variant.type
           })
         )
       });
@@ -200,21 +200,22 @@ function mix(coins, converters) {
   };
 
   const convertedCoins = applyCurrencyConverters(orderedCoins, ...converters, coinIsActive(sample));
-
   convertedCoins.forEach(coin => {
-    if (coin.isMultivariant) {
-      coin.variants.forEach(variant => {
-        finalMix[variant.name] = assign({}, variant);
-      });
-    } else {
-      finalMix[coin.name] = assign({}, coin);
-    }
+    finalMix[coin.name] = assign({}, coin);
   });
 
   return finalMix;
 }
 
 function checkChestNamespace(coin, testDefinition, namespace) {
+  if (namespace[coin.name] === true) {
+    throw new Error(
+      `The name ${coin.name} on the test with the following test definition ${JSON.stringify(
+        testDefinition
+      )} is already in use`
+    );
+  }
+
   if (coin.isMultivariant) {
     coin.variants.forEach(variant => {
       if (namespace[variant.name] === true) {
@@ -227,17 +228,10 @@ function checkChestNamespace(coin, testDefinition, namespace) {
       // eslint-disable-next-line no-param-reassign
       namespace[variant.name] = true;
     });
-  } else {
-    if (namespace[coin.name] === true) {
-      throw new Error(
-        `The name ${coin.name} on the test with the following test definition ${JSON.stringify(
-          testDefinition
-        )} is already in use`
-      );
-    }
-    // eslint-disable-next-line no-param-reassign
-    namespace[coin.name] = true;
   }
+
+  // eslint-disable-next-line no-param-reassign
+  namespace[coin.name] = true;
 }
 
 /**

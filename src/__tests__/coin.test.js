@@ -158,6 +158,7 @@ describe('Coin tests', () => {
 
     beforeEach(() => {
       definition = {
+        name: 'multi',
         variants: [
           { name: 'variant1', probability: 10 },
           { name: 'variant2', probability: 20 },
@@ -169,6 +170,7 @@ describe('Coin tests', () => {
     });
 
     it('is defined correctly', () => {
+      expect(testCoin.name).toEqual('multi');
       expect(testCoin.metadata).toEqual({});
       expect(testCoin.type).toEqual(MULTIVARIANT);
       expect(testCoin.variants).toEqual([
@@ -235,6 +237,7 @@ describe('Coin tests', () => {
 
     beforeEach(() => {
       definition = {
+        name: 'depMulti',
         variants: [
           {
             dependsOn: [
@@ -257,6 +260,7 @@ describe('Coin tests', () => {
     });
 
     it('is defined correctly', () => {
+      expect(testCoin.name).toEqual('depMulti');
       expect(testCoin.metadata).toEqual({});
       expect(testCoin.type).toEqual(DEPENDENT_MULTIVARIANT);
       expect(testCoin.variants).toEqual([
