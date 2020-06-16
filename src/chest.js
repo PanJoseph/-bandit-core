@@ -101,7 +101,7 @@ function createNodeGraph(coins) {
  * @param {Array} coins list of coins to flip and select values for
  */
 function flip(coins) {
-  return coins.map(coin => pickSample(shuffle(createSample(coin.createMapping(), 100))));
+  return coins.map(coin => pickSample(shuffle(createSample(coin.createSamplingMapping(), 100))));
 }
 
 /**
@@ -249,11 +249,11 @@ function Chest(testDefinitions) {
   const properties = {
     coins: testDefinitions.map(testDefinition => {
       let coin;
-      switch (testDefinition.type) {
+      switch (testDefinition.type.toLowerCase()) {
         case 'dependent':
           coin = DependentCoin(testDefinition);
           break;
-        case 'dependentMultivariant':
+        case 'dependentmultivariant':
           coin = DependentMultivariantCoin(testDefinition);
           break;
         case 'multivariant':

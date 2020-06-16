@@ -1,4 +1,11 @@
-import { Coin, DependentCoin, MultivariantCoin, DependentMultivariantCoin } from '../coin';
+import {
+  Coin,
+  DependentCoin,
+  MultivariantCoin,
+  DependentMultivariantCoin,
+  Variant,
+  DependentVariant
+} from '../coin';
 import {
   NORMAL,
   MULTIVARIANT,
@@ -9,7 +16,7 @@ import {
 } from '../coinTypes';
 
 describe('Coin tests', () => {
-  describe('Basic coin test', () => {
+  describe('Normal coin test', () => {
     let definition;
     let testCoin;
 
@@ -42,7 +49,27 @@ describe('Coin tests', () => {
     });
 
     it('returns a proper mapping', () => {
-      expect(testCoin.createMapping()).toEqual([{ count: 10, value: 'normal' }]);
+      expect(testCoin.createSamplingMapping()).toEqual([{ count: 10, value: 'normal' }]);
+    });
+
+    it('returns null for getDependent', () => {
+      expect(testCoin.getDependent('fake')).toBeFalsy();
+    });
+
+    it('returns null for getVariant', () => {
+      expect(testCoin.getVariant('fake')).toBeFalsy();
+    });
+
+    it('throws an error when a defintion without a name is passed', () => {
+      expect(() => Coin({ probability: 10 })).toThrow();
+    });
+
+    it('throws an error when a defintion without a probability is passed', () => {
+      expect(() => Coin({ name: 'test1' })).toThrow();
+    });
+
+    it('throws an error when a defintion with an invalid probability is passed', () => {
+      expect(() => Coin({ name: 'test1', probability: 5000 })).toThrow();
     });
   });
 
@@ -104,7 +131,24 @@ describe('Coin tests', () => {
     });
 
     it('returns a proper mapping', () => {
-      expect(testCoin.createMapping()).toEqual([{ count: 10, value: 'dependent' }]);
+      expect(testCoin.createSamplingMapping()).toEqual([{ count: 10, value: 'dependent' }]);
+    });
+
+    it('returns the correct dependent for getDependent', () => {
+      expect(testCoin.getDependent('name')).toEqual({
+        active: true,
+        behavior: true,
+        name: 'name',
+        probability: 10
+      });
+    });
+
+    it('returns null when a dependent is not found with getDependent', () => {
+      expect(testCoin.getDependent('fake')).toBeFalsy();
+    });
+
+    it('returns null for getVariant', () => {
+      expect(testCoin.getVariant('fake')).toBeFalsy();
     });
   });
 
@@ -173,11 +217,15 @@ describe('Coin tests', () => {
     });
 
     it('returns a proper mapping', () => {
-      expect(testCoin.createMapping()).toEqual([
+      expect(testCoin.createSamplingMapping()).toEqual([
         { count: 10, value: 'variant1' },
         { count: 20, value: 'variant2' },
         { count: 30, value: 'variant3' }
       ]);
+    });
+
+    it('returns null for getDependent', () => {
+      expect(testCoin.getDependent('fake')).toBeFalsy();
     });
   });
 
@@ -273,11 +321,88 @@ describe('Coin tests', () => {
     });
 
     it('returns a proper mapping', () => {
-      expect(testCoin.createMapping()).toEqual([
+      expect(testCoin.createSamplingMapping()).toEqual([
         { count: 10, value: 'variant1' },
         { count: 20, value: 'variant2' },
         { count: 30, value: 'variant3' }
       ]);
+    });
+
+    it('returns the correct dependent for getDependent', () => {
+      expect(testCoin.getDependent('name')).toEqual({
+        active: true,
+        behavior: true,
+        name: 'name',
+        probability: 10
+      });
+    });
+
+    it('returns null when a dependent is not found with getDependent', () => {
+      expect(testCoin.getDependent('fake')).toBeFalsy();
+    });
+  });
+
+  describe('Variant tests', () => {
+    let definition;
+    let testVariant;
+    beforeEach(() => {
+      definition = {
+        name: 'variant',
+        probability: 10
+      };
+
+      testVariant = Variant(definition);
+    });
+
+    it('is defined correctly', () => {
+      expect(testVariant.name).toEqual('variant');
+      expect(testVariant.probability).toEqual(10);
+      expect(testVariant.metadata).toEqual({});
+      expect(testVariant.type).toEqual(VARIANT);
+    });
+
+    it('throws an error when a defintion without a name is passed', () => {
+      expect(() => Variant({ probability: 10 })).toThrow();
+    });
+
+    it('throws an error when a defintion without a probability is passed', () => {
+      expect(() => Variant({ name: 'test1' })).toThrow();
+    });
+
+    it('throws an error when a defintion with an invalid probability is passed', () => {
+      expect(() => Variant({ name: 'test1', probability: 5000 })).toThrow();
+    });
+  });
+
+  describe('DependentVariant tests', () => {
+    let definition;
+    let testVariant;
+    beforeEach(() => {
+      definition = {
+        name: 'variant',
+        probability: 10
+      };
+
+      testVariant = DependentVariant(definition);
+    });
+
+    it('is defined correctly', () => {
+      expect(testVariant.name).toEqual('variant');
+      expect(testVariant.probability).toEqual(10);
+      expect(testVariant.metadata).toEqual({});
+      expect(testVariant.type).toEqual(DEPENDENT_VARIANT);
+    });
+
+    it('throws an error when a defintion without a name is passed', () => {
+      expect(() => DependentVariant({ probability: 10 })).toThrow();
+    });
+
+    it('throws an error when a defintion without a probability is passed', () => {
+      expect(() => DependentVariant({ name: 'test1' })).toThrow();
+    });
+
+    it('throws an error when a defintion with an invalid probability is passed', () => {
+      expect(() => DependentVariant({ name: 'test1', probability: 5000 })).toThrow();
     });
   });
 });

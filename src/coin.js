@@ -55,7 +55,7 @@ function getDependent(coin, name) {
         const dependents = coin.variants[i].dependsOn;
 
         if (dependents) {
-          const variant = dependents.find(match => match.name === name);
+          const variant = dependents.find(dep => dep.name === name);
 
           if (variant) return variant;
         }
@@ -76,19 +76,13 @@ function getDependent(coin, name) {
  * @example MultivariantCoin(variants: [{name: 'variant1', probability: 10}, {name : 'variant2', probability: 20}]) => [{count: 10, value: 'variant1'}, {count: 20, value: 'variant2'}]
  */
 function createSamplingMapping(coin) {
-  switch (coin.type) {
-    case MULTIVARIANT:
-    case DEPENDENT_MULTIVARIANT:
-      return coin.variants.map(variant => ({
-        count: variant.probability,
-        value: variant.name
-      }));
-    case NORMAL:
-    case DEPENDENT:
-      return [{ count: coin.probability, value: coin.name }];
-    default:
-      return null;
+  if (isMultivariant(coin)) {
+    return coin.variants.map(variant => ({
+      count: variant.probability,
+      value: variant.name
+    }));
   }
+  return [{ count: coin.probability, value: coin.name }];
 }
 
 /**
@@ -166,6 +160,8 @@ export function Coin(definition) {
   };
 
   const funcs = {
+    getDependent: name => getDependent(properties, name),
+    getVariant: name => getVariant(properties, name),
     isMultivariant: isMultivariant(properties),
     isDependent: isDependent(properties),
     createSamplingMapping: () => createSamplingMapping(properties)
@@ -191,6 +187,7 @@ export function DependentCoin(definition) {
 
   const funcs = {
     getDependent: name => getDependent(properties, name),
+    getVariant: name => getVariant(properties, name),
     isMultivariant: isMultivariant(properties),
     isDependent: isDependent(properties),
     createSamplingMapping: () => createSamplingMapping(properties)
@@ -215,14 +212,14 @@ export function DependentMultivariantCoin(definition) {
         ? {
             dependsOn: variant.dependsOn,
             metadata: variant.metadata || {},
-            name: validateField(definition.name, 'name', definition),
-            probability: validateField(definition.probability, 'probability', definition),
+            name: validateField(variant.name, 'name', definition),
+            probability: validateField(variant.probability, 'probability', definition),
             type: DEPENDENT_VARIANT
           }
         : {
             metadata: variant.metadata || {},
-            name: validateField(definition.name, 'name', definition),
-            probability: validateField(definition.probability, 'probability', definition),
+            name: validateField(variant.name, 'name', definition),
+            probability: validateField(variant.probability, 'probability', definition),
             type: VARIANT
           }
     )
@@ -252,13 +249,14 @@ export function MultivariantCoin(definition) {
     type: MULTIVARIANT,
     variants: definition.variants.map(variant => ({
       metadata: variant.metadata || {},
-      name: validateField(definition.name, 'name', definition),
-      probability: validateField(definition.probability, 'probability', definition),
+      name: validateField(variant.name, 'name', definition),
+      probability: validateField(variant.probability, 'probability', definition),
       type: VARIANT
     }))
   };
 
   const funcs = {
+    getDependent: name => getDependent(properties, name),
     getVariant: name => getVariant(properties, name),
     isMultivariant: isMultivariant(properties),
     isDependent: isDependent(properties),
@@ -270,4 +268,11 @@ export function MultivariantCoin(definition) {
   return deepFreeze(assign({}, properties, funcs), exclusions);
 }
 
-export default { Coin, DependentCoin, DependentMultivariantCoin, MultivariantCoin };
+export default {
+  Coin,
+  DependentCoin,
+  DependentMultivariantCoin,
+  MultivariantCoin,
+  Variant,
+  DependentVariant
+};

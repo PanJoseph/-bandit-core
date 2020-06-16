@@ -10,8 +10,8 @@ describe('Chest tests', () => {
       expect(chest.coins.length).toEqual(7);
     });
 
-    it('throws an error when test sample is not valid', () => {
-      const badSample = [
+    it('throws an error when test sample has a test with an invalid type', () => {
+      const invalidTypeSample = [
         {
           metadata: {
             persist: false
@@ -21,9 +21,76 @@ describe('Chest tests', () => {
           type: 'invalid'
         }
       ];
-      expect(() => Chest(badSample)).toThrow(
+      expect(() => Chest(invalidTypeSample)).toThrow(
         new Error(
-          `The type on the test with the following test definition ${badSample[0]} is invalid`
+          `The type on the test with the following test definition ${JSON.stringify(
+            invalidTypeSample[0]
+          )} is invalid`
+        )
+      );
+    });
+
+    it('throws an error when tests have duplicate names', () => {
+      const duplicateSample = [
+        {
+          dependsOn: [
+            {
+              active: true,
+              behavior: true,
+              name: 'normal1',
+              priority: 2
+            }
+          ],
+          name: 'normal1',
+          probability: 100,
+          type: 'dependent'
+        },
+        { name: 'normal1', probability: 0, type: 'normal' }
+      ];
+
+      const duplicateMultivariantSample = [
+        {
+          metadata: {},
+          name: 'multi',
+          type: 'dependentMultivariant',
+          variants: [
+            {
+              dependsOn: [
+                {
+                  active: true,
+                  behavior: true,
+                  name: 'v1',
+                  priority: 1
+                }
+              ],
+              name: 'v3',
+              probability: 100
+            },
+            { name: 'v5', probability: 0 },
+            { name: 'v6', probability: 0 }
+          ]
+        },
+        {
+          metadata: {},
+          name: 'multi',
+          type: 'multivariant',
+          variants: [
+            { name: 'v1', probability: 100 },
+            { name: 'v2', probability: 0 },
+            { name: 'v3', probability: 0 }
+          ]
+        }
+      ];
+
+      expect(() => Chest(duplicateSample)).toThrow(
+        new Error(
+          'The name normal1 on the test with the following test definition {"name":"normal1","probability":0,"type":"normal"} is already in use'
+        )
+      );
+
+      expect(() => Chest(duplicateMultivariantSample)).toThrow(
+        new Error(
+          'The name v3 on the test with the following test definition {"metadata":{},"name":"multi","type":"multivariant","variants":[{"name":"v1","probability":100},{"name":"v2","probability":0},{"name":"v3","probability":0}]} is already in use'
         )
       );
     });
