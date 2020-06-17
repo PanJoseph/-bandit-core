@@ -1,16 +1,17 @@
-import Chest from './src/chest';
 import {
+  Chest,
   Coin as NormalCoin,
   DependentCoin,
-  DependentMultivariantCoin,
+  // eslint-disable-next-line camelcase
+  DependentMultivariantCoin as unstable_DependentMultivariantCoin,
   MultivariantCoin
-} from './src/coin';
+} from './cjs/bandit';
 
 const Bandit = {
   Chest,
   NormalCoin,
   DependentCoin,
-  DependentMultivariantCoin,
+  unstable_DependentMultivariantCoin,
   MultivariantCoin
 };
 

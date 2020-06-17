@@ -1,10 +1,10 @@
-# -bandit-core
+# Bandit-core
 
-Core library for the Bandit.js
+Core library for the Banditjs
 
 Bandit.js is a simple, lightweight A/B testing library. Bandit's goal is to make A/B testing more accessible for application developers.
 
-There are currently 3 different kinds of testing types Bandit supports, normal, multivariate & dependent A/B tests.
+There are currently 3 different kinds of testing types Bandit supports, normal, multivariant & dependent A/B tests.
 
 Bandit is primarily configuaration driven, A/B tests are all derived from a JSON/Javascript configuration you provide when instanciating Bandit.
 
@@ -23,7 +23,7 @@ Your coin needs a unique name, probability (a natural number from 0-100) & the `
 **Example**
 
 ```javascript
-import { Chest } from '@bandit/bandit-core';
+import { Chest } from '@banditjs/bandit-core';
 
 const definitions = [
   {
@@ -46,7 +46,7 @@ A Multivariant coin represents a multi-experiment A/B test, which is an A/B test
 **Example**
 
 ```javascript
-import { Chest } from '@bandit/bandit-core';
+import { Chest } from '@banditjs/bandit-core';
 
 const defintiions = [
   {
@@ -83,7 +83,7 @@ A dependent coin represents an A/B test that can be active or not depending on t
 **Example**
 
 ```javascript
-import { Chest } from '@bandit/bandit-core';
+import { Chest } from '@banditjs/bandit-core';
 
 const defintiions = [
 	{
@@ -144,7 +144,7 @@ These converters are applied via a call to `Chest.mixCoins(...currencyConverters
 You want to tag some extra metadata on your tests in order to run some analytics on the distribution of what tests were active across browsers.
 
 ```javascript
-import { Chest } from '@bandit/bandit-core';
+import { Chest } from '@banditjs/bandit-core';
 
 const browserName = // Some calculation of what browser currently in use
 const browserTrackingConverter = coin => coin.metadata.browser = browserName

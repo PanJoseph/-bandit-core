@@ -12,7 +12,7 @@ module.exports = [
       format: 'cjs',
       indent: false
     },
-    plugins: [resolve(), commonjs(), babel()]
+    plugins: [resolve(), commonjs(), babel({ babelHelpers: 'runtime' })]
   },
   {
     // ESModule config
@@ -22,7 +22,7 @@ module.exports = [
       format: 'es',
       indent: false
     },
-    plugins: [resolve(), commonjs(), babel()]
+    plugins: [resolve(), commonjs(), babel({ babelHelpers: 'runtime' })]
   },
   {
     // ESModule for browser config
@@ -54,7 +54,7 @@ module.exports = [
       indent: false,
       name: 'bandit'
     },
-    plugins: [resolve(), babel({ exclude: 'node_modules/**' }), commonjs()]
+    plugins: [resolve(), babel({ babelHelpers: 'runtime', exclude: 'node_modules/**' }), commonjs()]
   },
   {
     // UMD config
@@ -68,7 +68,7 @@ module.exports = [
     plugins: [
       resolve(),
       commonjs(),
-      babel({ exclude: 'node_modules/**' }),
+      babel({ babelHelpers: 'runtime', exclude: 'node_modules/**' }),
       terser({
         compress: {
           pure_getters: true,
