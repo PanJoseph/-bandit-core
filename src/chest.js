@@ -3,7 +3,6 @@ import assign from 'object-assign';
 import { Coin, DependentCoin, DependentMultivariantCoin, MultivariantCoin } from './coin';
 import Graph from './graph';
 import { createSample, pickSample, shuffle } from './stat';
-import { flattenDeep } from './utils';
 import { DEPENDENT, DEPENDENT_MULTIVARIANT } from './coinTypes';
 import applyCurrencyConverters from './applyCurrencyConverter';
 
@@ -31,51 +30,6 @@ function getCoin(coins, name) {
 }
 
 /**
- * createNodeMapping taken an array of coins and creates a node mapping that can be transformed into a node graph
- *
- * @param {Array} coins coins to transform into a node mapping
- */
-function createNodeMapping(coins) {
-  const nodeMap = [];
-  coins.forEach(coin => {
-    switch (coin.type) {
-      case DEPENDENT:
-        nodeMap.push({
-          name: coin.name,
-          children: coin.dependsOn.map(child => getCoin(coins, child.name)),
-          details: {
-            dependsOn: coin.dependsOn || [],
-            metadata: coin.metadata || {},
-            probability: coin.probability,
-            type: coin.type
-          }
-        });
-        break;
-      case DEPENDENT_MULTIVARIANT:
-        nodeMap.push(
-          coin.variants.map(variant => ({
-            name: variant.name,
-            children: variant.dependsOn
-              ? variant.dependsOn.map(child => getCoin(coins, child.name))
-              : [],
-            details: {
-              dependsOn: variant.dependsOn || [],
-              metadata: coin.metadata || {},
-              probability: variant.probability,
-              type: coin.type
-            }
-          }))
-        );
-        break;
-      default:
-        break;
-    }
-  });
-
-  return flattenDeep(nodeMap);
-}
-
-/**
  * createNodeGraph takes a list of coins and creates a graph where vertices are dependent
  * coins and edges point to coins vertex is dependent on
  *
@@ -83,13 +37,39 @@ function createNodeMapping(coins) {
  */
 function createNodeGraph(coins) {
   const nodeGraph = new Graph();
-
-  createNodeMapping(coins).forEach(node => {
-    nodeGraph.addNode(node.name, node.details);
-    node.children.forEach(child => {
-      nodeGraph.addNode(child.name);
-      nodeGraph.addEdge(node.name, child.name);
-    });
+  coins.forEach(coin => {
+    switch (coin.type) {
+      case DEPENDENT:
+        nodeGraph.addNode(coin.name, {
+          dependsOn: coin.dependsOn,
+          metadata: coin.metadata,
+          probability: coin.probability,
+          type: coin.type
+        });
+        coin.dependsOn.forEach(child => {
+          nodeGraph.addNode(child.name);
+          nodeGraph.addEdge(coin.name, child.name);
+        });
+        break;
+      case DEPENDENT_MULTIVARIANT:
+        coin.variants.forEach(variant => {
+          if (variant.dependsOn) {
+            nodeGraph.addNode(variant.name, {
+              dependsOn: variant.dependsOn || [],
+              metadata: variant.metadata,
+              probability: variant.probability,
+              type: variant.type
+            });
+            variant.dependsOn.forEach(child => {
+              nodeGraph.addNode(child.name);
+              nodeGraph.addEdge(variant.name, child.name);
+            });
+          }
+        });
+        break;
+      default:
+        break;
+    }
   });
 
   return nodeGraph;
@@ -166,6 +146,37 @@ function isDependentActive(sample, dependent) {
 }
 
 /**
+ * Converter that takes a sample of flipped coins and determines whether they are active or not.
+ * Normal coins are active if they are present in the sample
+ * Multivariant coins will have at most one variant active in their sample and that is based on which variant, if any, are present in the sample
+ * Dependentare active if they are present in the sample unless one of their dependents forces them behave differently
+ *
+ * @param {Array} sample sample to use for determining which coins are active
+ */
+function isActiveConverter(sample) {
+  return coin => {
+    if (coin.isMultivariant) {
+      return assign({}, coin, {
+        variants: coin.variants.map(variant =>
+          assign({}, variant, {
+            active: variant.dependsOn
+              ? isDependentActive(sample, variant)
+              : sample.indexOf(variant.name) > -1,
+            metadata: variant.metadata || coin.metadata
+          })
+        )
+      });
+    }
+
+    if (coin.isDependent) {
+      return assign({}, coin, { active: isDependentActive(sample, coin) });
+    }
+
+    return assign({}, coin, { active: sample.indexOf(coin.name) > -1 });
+  };
+}
+
+/**
  * mix takes a chest of coins and does the work to set all the coins in the chest to active or inactive
  * mix will flip all the coins, handle any forced dependencies & apply any currency converters passed
  *
@@ -175,36 +186,8 @@ function isDependentActive(sample, dependent) {
 function mix(coins, converters) {
   const orderedCoins = setPickingOrder(coins);
   const sample = flip(orderedCoins);
-  const finalMix = {};
 
-  const coinIsActive = samp => coin => {
-    if (coin.isMultivariant) {
-      return assign({}, coin, {
-        variants: coin.variants.map(variant =>
-          assign({}, variant, {
-            active: variant.dependsOn
-              ? isDependentActive(samp, variant)
-              : samp.indexOf(variant.name) > -1,
-            metadata: variant.metadata || coin.metadata,
-            type: variant.type
-          })
-        )
-      });
-    }
-
-    if (coin.isDependent) {
-      return assign({}, coin, { active: isDependentActive(samp, coin) });
-    }
-
-    return assign({}, coin, { active: samp.indexOf(coin.name) > -1 });
-  };
-
-  const convertedCoins = applyCurrencyConverters(orderedCoins, ...converters, coinIsActive(sample));
-  convertedCoins.forEach(coin => {
-    finalMix[coin.name] = assign({}, coin);
-  });
-
-  return finalMix;
+  return applyCurrencyConverters(orderedCoins, ...converters, isActiveConverter(sample));
 }
 
 function checkChestNamespace(coin, testDefinition, namespace) {

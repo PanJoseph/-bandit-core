@@ -205,4 +205,4 @@ const sample = Chest(defintiions, [browserTrackingConverter]).mixCoins();
 
 ### isActive converter
 
-By default the first converted always applied is the `isActive` converter, it applies a boolean `active` property to all coins & variants in the sample depending on whether or not they were flipped active when mixing the coins in the chest. This includes flipping dependent coins active and inactive depending on the results of their dependents.
+By default the first converted always applied is the `isActive` converter, it applies a boolean `active` property to all coins & variants in the sample depending on whether or not they were flipped active when mixing the coins in the chest. This includes flipping dependent coins active and inactive depending on the results of the coins they are dependent on.

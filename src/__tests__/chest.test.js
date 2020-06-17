@@ -111,8 +111,6 @@ describe('Chest tests', () => {
       const nodes = {
         normal2: [],
         v4: ['depends2'],
-        v5: [],
-        v6: [],
         depends: ['depends2'],
         depends2: ['normal2'],
         depends3: ['depends']

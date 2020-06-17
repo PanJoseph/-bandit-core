@@ -1,7 +1,7 @@
 {
-  "name": "@bandit/bandit-core",
+  "name": "@banditjs/bandit-core",
   "version": "1.0.0-beta",
-  "description": "",
+  "description": "Core library for the Bandit.js",
   "main": "cjs/bandit.js",
   "unpkg": "umd/bandit.js",
   "module": "es/bandit.js",
@@ -64,5 +64,10 @@
   "bugs": {
     "url": "https://github.com/PanJoseph/bandit-core/issues"
   },
-  "homepage": "https://github.com/PanJoseph/bandit-core#readme"
+  "homepage": "https://github.com/PanJoseph/bandit-core#readme",
+  "keywords": [
+    "ab-testing",
+    "bandit",
+    "banditjs"
+  ]
 }
