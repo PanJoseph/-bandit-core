@@ -1,15 +1,16 @@
 {
   "name": "@banditjs/bandit-core",
-  "version": "1.0.0-beta",
+  "version": "1.0.1-beta",
   "description": "Core library for the Bandit.js",
   "main": "cjs/bandit.js",
   "unpkg": "umd/bandit.js",
   "module": "es/bandit.js",
   "files": [
-    "cjs",
-    "umd",
-    "es",
-    "src"
+    "LICENSE",
+    "README.md",
+    "index.js",
+    "cjs/",
+    "umd/"
   ],
   "scripts": {
     "build": "rollup -c",
@@ -31,12 +32,14 @@
     "not dead"
   ],
   "dependencies": {
+    "@babel/runtime": "^7.10.2",
     "lodash.clonedeep": "^4.5.0",
     "object-assign": "^4.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
     "@babel/core": "^7.10.2",
+    "@babel/plugin-transform-runtime": "^7.10.1",
     "@babel/preset-env": "^7.10.2",
     "@rollup/plugin-babel": "^5.0.3",
     "@rollup/plugin-commonjs": "^13.0.0",
