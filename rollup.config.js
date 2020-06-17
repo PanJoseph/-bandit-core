@@ -1,14 +1,14 @@
-const babel = require('rollup-plugin-babel');
-const commonjs = require('rollup-plugin-commonjs');
-const resolve = require('rollup-plugin-node-resolve');
-const { terser } = require('rollup-plugin-terser');
+import resolve from '@rollup/plugin-node-resolve';
+import babel from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import { terser } from 'rollup-plugin-terser';
 
 module.exports = [
   {
     // CommonJS config
-    input: 'src/index.js',
+    input: 'index.js',
     output: {
-      file: 'cjs/zesty.js',
+      file: 'cjs/bandit.js',
       format: 'cjs',
       indent: false
     },
@@ -16,9 +16,9 @@ module.exports = [
   },
   {
     // ESModule config
-    input: 'src/index.js',
+    input: 'index.js',
     output: {
-      file: 'es/zesty.js',
+      file: 'es/bandit.js',
       format: 'es',
       indent: false
     },
@@ -26,9 +26,9 @@ module.exports = [
   },
   {
     // ESModule for browser config
-    input: 'src/index.js',
+    input: 'index.js',
     output: {
-      file: 'es/zesty.mjs',
+      file: 'es/bandit.mjs',
       format: 'es',
       indent: false
     },
@@ -47,23 +47,23 @@ module.exports = [
   },
   {
     // UMD dev config
-    input: 'src/index.js',
+    input: 'index.js',
     output: {
-      file: 'umd/zesty.js',
+      file: 'umd/bandit.js',
       format: 'umd',
       indent: false,
-      name: 'Zesty'
+      name: 'bandit'
     },
     plugins: [resolve(), babel({ exclude: 'node_modules/**' }), commonjs()]
   },
   {
     // UMD config
-    input: 'src/index.js',
+    input: 'index.js',
     output: {
-      file: 'umd/zesty.min.js',
+      file: 'umd/bandit.min.js',
       format: 'umd',
       indent: false,
-      name: 'Zesty'
+      name: 'bandit'
     },
     plugins: [
       resolve(),

@@ -3,7 +3,10 @@ import { createSample } from '../stat';
 describe('The statistics helper functions', () => {
   describe('createSample tests', () => {
     it('creates samples correctly', () => {
-      const values = [{ count: 10, value: 'first' }, { count: 90, value: 'second' }];
+      const values = [
+        { count: 10, value: 'first' },
+        { count: 90, value: 'second' }
+      ];
 
       const sample = createSample(values, 100);
 
@@ -13,7 +16,10 @@ describe('The statistics helper functions', () => {
     });
 
     it('fills missing values in with false', () => {
-      const values = [{ count: 10, value: 'first' }, { count: 10, value: 'second' }];
+      const values = [
+        { count: 10, value: 'first' },
+        { count: 10, value: 'second' }
+      ];
 
       const sample = createSample(values, 100);
 
@@ -24,7 +30,10 @@ describe('The statistics helper functions', () => {
     });
 
     it('fills only up to the max size passed', () => {
-      const values = [{ count: 100, value: 'first' }, { count: 100, value: 'second' }];
+      const values = [
+        { count: 100, value: 'first' },
+        { count: 100, value: 'second' }
+      ];
 
       const sample = createSample(values, 100);
 

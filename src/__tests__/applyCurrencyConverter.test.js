@@ -3,6 +3,7 @@ import applyCurrencyConverter from '../applyCurrencyConverter';
 const applyA = coin => ({ ...coin, first: true });
 const applyB = coin => ({ ...coin, second: false });
 const applyC = coin => (coin.value ? { ...coin, value: coin.value * 3 } : coin);
+const applyD = coin => ({ ...coin, first: 'appliedLast' });
 
 let coins;
 
@@ -40,6 +41,14 @@ describe('applyCurrencyConverter tests', () => {
       { name: 'coin1', first: true, second: false, value: 30 },
       { name: 'coin2', first: true, second: false },
       { name: 'coin3', first: true, second: false, value: 90 }
+    ]);
+  });
+
+  it('applies functions in backwards order of converters passed', () => {
+    expect(applyCurrencyConverter(coins, applyD, applyB, applyC, applyA)).toEqual([
+      { name: 'coin1', first: 'appliedLast', second: false, value: 30 },
+      { name: 'coin2', first: 'appliedLast', second: false },
+      { name: 'coin3', first: 'appliedLast', second: false, value: 90 }
     ]);
   });
 });
