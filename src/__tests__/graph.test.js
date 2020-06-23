@@ -178,47 +178,4 @@ describe('Graph tests', () => {
       expect(circleCheck.isCircular).toBeFalsy();
     });
   });
-
-  describe('toMap method tests', () => {
-    let testGraph;
-
-    beforeEach(() => {
-      testGraph = Graph();
-    });
-
-    it('returns a map correctly', () => {
-      const details = {
-        a: 'string',
-        b: 12345,
-        c: [1, 2, 3, 4, 5],
-        d: { a: 'a' }
-      };
-
-      testGraph.nodes.node1 = ['node2'];
-      testGraph.nodes.node2 = [];
-      testGraph.details.node1 = details;
-      testGraph.details.node2 = {};
-
-      expect(testGraph.toMap()).toEqual({
-        nodes: [
-          {
-            details: {
-              a: 'string',
-              b: 12345,
-              c: [1, 2, 3, 4, 5],
-              d: { a: 'a' }
-            },
-            id: 'node1',
-            label: 'node1'
-          },
-          {
-            details: {},
-            id: 'node2',
-            label: 'node2'
-          }
-        ],
-        edges: [{ from: 'node1', to: 'node2' }]
-      });
-    });
-  });
 });

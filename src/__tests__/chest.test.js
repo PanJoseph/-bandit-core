@@ -1,7 +1,6 @@
 import Chest from '../chest';
 import { circularDefinition, fixedDefinition } from '../definitions/definitions';
 import { NORMAL, DEPENDENT, VARIANT, DEPENDENT_VARIANT } from '../coinTypes';
-import { flattenDeep } from '../utils';
 
 describe('Chest tests', () => {
   describe('Init tests', () => {
@@ -173,11 +172,11 @@ describe('Chest tests', () => {
       const chest = Chest(fixedDefinition);
       const mixed = chest.mixCoins();
 
-      const isActive = flattenDeep(
-        Object.values(mixed).map(coin =>
+      const isActive = Object.values(mixed)
+        .map(coin =>
           coin.isMultivariant ? coin.variants.map(variant => variant.active) : coin.active
         )
-      );
+        .flat();
 
       expect(isActive).toEqual([
         true,
