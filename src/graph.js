@@ -8,7 +8,6 @@
   ]
 */
 import assign from 'object-assign';
-import { flattenDeep } from './utils';
 
 function hasNode(nodes, node) {
   return Object.keys(nodes).indexOf(node) > -1;
@@ -72,22 +71,6 @@ function isCircular(nodes) {
   return { isCircular: false };
 }
 
-function toMap(nodes, details) {
-  const nodeKeys = Object.keys(nodes);
-
-  const nodeMap = nodeKeys.map(node => ({
-    details: details[node],
-    id: node,
-    label: node
-  }));
-
-  const edgeMap = flattenDeep(
-    nodeKeys.map(node => nodes[node].map(child => ({ from: node, to: child })))
-  );
-
-  return { edges: edgeMap, nodes: nodeMap };
-}
-
 function Graph() {
   const properties = {
     nodes: {},
@@ -99,8 +82,7 @@ function Graph() {
     addNode: (node, details) => addNode(properties.nodes, properties.details, node, details),
     hasEdgeTo: (node1, node2) => hasEdgeTo(properties.nodes, node1, node2),
     addEdge: (node1, node2) => addEdge(properties.nodes, node1, node2),
-    isCircular: () => isCircular(properties.nodes),
-    toMap: () => toMap(properties.nodes, properties.details)
+    isCircular: () => isCircular(properties.nodes)
   };
 
   return assign({}, properties, funcs);

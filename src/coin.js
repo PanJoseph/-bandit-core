@@ -1,6 +1,4 @@
 import assign from 'object-assign';
-
-import { deepFreeze } from './utils';
 import {
   NORMAL,
   MULTIVARIANT,
@@ -167,9 +165,7 @@ export function Coin(definition) {
     createSamplingMapping: () => createSamplingMapping(properties)
   };
 
-  const exclusions = ['metadata'];
-
-  return deepFreeze(assign({}, properties, funcs), exclusions);
+  return assign({}, properties, funcs);
 }
 /**
  * DependentCoin represents a test whose outcome can depend on another test's outcome
@@ -193,9 +189,7 @@ export function DependentCoin(definition) {
     createSamplingMapping: () => createSamplingMapping(properties)
   };
 
-  const exclusions = ['metadata'];
-
-  return deepFreeze(assign({}, properties, funcs), exclusions);
+  return assign({}, properties, funcs);
 }
 
 /**
@@ -234,9 +228,7 @@ export function DependentMultivariantCoin(definition) {
     createSamplingMapping: () => createSamplingMapping(properties)
   };
 
-  const exclusions = ['metadata'];
-
-  return deepFreeze(assign({}, properties, funcs), exclusions);
+  return assign({}, properties, funcs);
 }
 
 /**
@@ -265,9 +257,7 @@ export function MultivariantCoin(definition) {
     createSamplingMapping: () => createSamplingMapping(properties)
   };
 
-  const exclusions = ['metadata'];
-
-  return deepFreeze(assign({}, properties, funcs), exclusions);
+  return assign({}, properties, funcs);
 }
 
 export default {
