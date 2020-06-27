@@ -6,7 +6,7 @@ import { terser } from 'rollup-plugin-terser';
 module.exports = [
   {
     // CommonJS config
-    input: 'index.js',
+    input: 'src/index.js',
     output: {
       file: 'cjs/bandit.js',
       format: 'cjs',
@@ -16,7 +16,7 @@ module.exports = [
   },
   {
     // ESModule config
-    input: 'index.js',
+    input: 'src/index.js',
     output: {
       file: 'es/bandit.js',
       format: 'es',
@@ -26,7 +26,7 @@ module.exports = [
   },
   {
     // ESModule for browser config
-    input: 'index.js',
+    input: 'src/index.js',
     output: {
       file: 'es/bandit.mjs',
       format: 'es',
@@ -47,7 +47,7 @@ module.exports = [
   },
   {
     // UMD dev config
-    input: 'index.js',
+    input: 'src/index.js',
     output: {
       file: 'umd/bandit.js',
       format: 'umd',
@@ -58,7 +58,7 @@ module.exports = [
   },
   {
     // UMD config
-    input: 'index.js',
+    input: 'src/index.js',
     output: {
       file: 'umd/bandit.min.js',
       format: 'umd',
