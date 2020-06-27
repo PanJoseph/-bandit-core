@@ -186,14 +186,16 @@ function isActiveConverter(sample) {
 function mix(coins, converters) {
   const orderedCoins = setPickingOrder(coins);
   const sample = flip(orderedCoins);
-  let finalMix = {};
+  const finalMix = {};
 
   const convertedCoins = applyCurrencyConverters(
     orderedCoins,
     ...converters,
     isActiveConverter(sample)
   );
-  convertedCoins.forEach(coin => (finalMix[coin.name] = coin));
+  convertedCoins.forEach(coin => {
+    finalMix[coin.name] = coin;
+  });
 
   return finalMix;
 }
