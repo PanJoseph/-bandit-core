@@ -186,8 +186,18 @@ function isActiveConverter(sample) {
 function mix(coins, converters) {
   const orderedCoins = setPickingOrder(coins);
   const sample = flip(orderedCoins);
+  const finalMix = {};
 
-  return applyCurrencyConverters(orderedCoins, ...converters, isActiveConverter(sample));
+  const convertedCoins = applyCurrencyConverters(
+    orderedCoins,
+    ...converters,
+    isActiveConverter(sample)
+  );
+  convertedCoins.forEach(coin => {
+    finalMix[coin.name] = coin;
+  });
+
+  return finalMix;
 }
 
 function checkChestNamespace(coin, testDefinition, namespace) {
